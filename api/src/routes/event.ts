@@ -91,7 +91,7 @@ export default async function eventRoutes(fastify: FastifyInstance, options: Fas
 
             // Create player
             const player = await prisma.player.create({
-                data: { name, email, phone, eventId: id }
+                data: { name, email, phone: phone || null, eventId: id }
             });
 
             // If first player, generate AI ref

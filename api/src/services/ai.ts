@@ -55,10 +55,12 @@ export function cosineSimilarity(a: number[], b: number[]) {
     let dotProduct = 0;
     let magnitudeA = 0;
     let magnitudeB = 0;
-    for (let i = 0; i < a.length; i++) {
-        dotProduct += a[i] * b[i];
-        magnitudeA += a[i] * a[i];
-        magnitudeB += b[i] * b[i];
+    for (let i = 0; i < Math.min(a.length, b.length); i++) {
+        const valA = a[i] ?? 0;
+        const valB = b[i] ?? 0;
+        dotProduct += valA * valB;
+        magnitudeA += valA * valA;
+        magnitudeB += valB * valB;
     }
     magnitudeA = Math.sqrt(magnitudeA);
     magnitudeB = Math.sqrt(magnitudeB);
