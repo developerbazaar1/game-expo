@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { getEvent, submitPrompt } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,6 +22,9 @@ export default function ScreenPage() {
     const [showQR, setShowQR] = useState(false);
     const [statusMessage, setStatusMessage] = useState('System Idle');
     const [copied, setCopied] = useState(false);
+    const isFetchingRef = useRef(false);
+    const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const abortControllerRef = useRef<AbortController | null>(null);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(playUrl);
@@ -61,8 +64,14 @@ export default function ScreenPage() {
     }, [loading, !!activePlayer]);
 
     const fetchData = async () => {
+        if (isFetchingRef.current) return;
+        isFetchingRef.current = true;
+        abortControllerRef.current?.abort();
+        abortControllerRef.current = new AbortController();
+
         try {
-            const eventData = await getEvent(eventId);
+            const eventData: any = await getEvent(eventId, abortControllerRef.current.signal);
+            setError('');
             setEvent(eventData);
             setPlayers(eventData.players || []);
 
@@ -75,14 +84,30 @@ export default function ScreenPage() {
                 setLastSubmission(submissions[0]);
             }
         } catch (err: any) {
+            if (err?.name === 'AbortError') return;
             setError(err.message);
+        } finally {
+            isFetchingRef.current = false;
         }
     };
 
     useEffect(() => {
-        fetchData();
-        const interval = setInterval(fetchData, 2000);
-        return () => clearInterval(interval);
+        let active = true;
+
+        const poll = async () => {
+            if (!active) return;
+            await fetchData();
+            if (!active) return;
+            pollTimeoutRef.current = setTimeout(poll, 4000);
+        };
+
+        poll();
+
+        return () => {
+            active = false;
+            if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
+            abortControllerRef.current?.abort();
+        };
     }, [eventId]);
 
     const handleSendPrompt = async (e: React.FormEvent) => {

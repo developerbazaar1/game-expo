@@ -11,7 +11,7 @@ export default function AIImagePanel({ imageUrl, description }: { imageUrl: stri
                     key={imageUrl}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    src={`${imageUrl}${imageUrl.includes('?') ? '&' : '?'}v=${Date.now()}`}
+                    src={imageUrl}
                     className="w-full h-full object-cover"
                     alt="AI Reference"
                 />

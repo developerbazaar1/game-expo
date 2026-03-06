@@ -1,8 +1,28 @@
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { PrismaClient } from '@prisma/client';
-import { generateImageFromPrompt, getPromptSimilarity } from '../services/gemini.service.js';
+import { aiService } from '../services/gemini.service.js';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 
 const prisma = new PrismaClient();
+
+const REFERENCE_IMAGE_FILE = process.env.REFERENCE_IMAGE_FILE || 'test1.png';
+
+function getMimeTypeFromFileName(fileName: string) {
+    const ext = path.extname(fileName).toLowerCase();
+    if (ext === '.png') return 'image/png';
+    if (ext === '.jpg' || ext === '.jpeg') return 'image/jpeg';
+    if (ext === '.webp') return 'image/webp';
+    return 'application/octet-stream';
+}
+
+async function loadReferenceImageAsDataUrl() {
+    const imagePath = path.resolve(process.cwd(), 'src', 'assets', REFERENCE_IMAGE_FILE);
+    const imageBuffer = await readFile(imagePath);
+    const mimeType = getMimeTypeFromFileName(REFERENCE_IMAGE_FILE);
+    const base64 = imageBuffer.toString('base64');
+    return `data:${mimeType};base64,${base64}`;
+}
 
 // WebSocket clients
 const clients = new Set<any>();
@@ -96,13 +116,8 @@ export default async function eventRoutes(fastify: FastifyInstance, options: Fas
 
             // If first player, generate AI ref
             if (event.status === 'waiting') {
-                const prompts = [
-                    "A futuristic warrior fighting a dragon in a burning city",
-                    "A neon cyberpunk samurai standing on a skyscraper",
-                    "A wizard casting lightning in a medieval battlefield"
-                ];
-                const referencePrompt = prompts[Math.floor(Math.random() * prompts.length)] as string;
-                const imageUrl = await generateImageFromPrompt(referencePrompt);
+                const imageUrl = await loadReferenceImageAsDataUrl();
+                const referencePrompt = await aiService.generatePromptFromImage(imageUrl);
 
                 await prisma.event.update({
                     where: { id },
@@ -154,11 +169,8 @@ export default async function eventRoutes(fastify: FastifyInstance, options: Fas
             if (player.score !== null) return reply.status(400).send({ error: 'Already submitted' });
 
             // Generate user AI image
-            const userImageUrl = await generateImageFromPrompt(prompt);
-
-            // Compare similarity
-            const scoreRaw = await getPromptSimilarity((event as any).referencePrompt || "", prompt);
-            const score = Math.round(scoreRaw * 100);
+            const referenceImageUrl = (event as any).referenceImageUrl || "";
+            const { imageUrl: userImageUrl, scorePercentage: score } = await aiService.generateImageAndScoreFromPrompt(prompt, referenceImageUrl);
 
             const updatedPlayer = await prisma.player.update({
                 where: { id: player.id },

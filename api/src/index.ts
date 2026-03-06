@@ -1,5 +1,4 @@
 import Fastify from 'fastify';
-import { PrismaClient } from '@prisma/client';
 import * as dotenv from 'dotenv';
 
 import cors from '@fastify/cors';
@@ -19,8 +18,6 @@ await fastify.register(cors, {
 });
 
 await fastify.register(websocket);
-
-const prisma = new PrismaClient();
 
 fastify.get('/health', async (request, reply) => {
   return { status: 'ok' };

@@ -15,7 +15,7 @@ export default function PlayerImagePanel({ imageUrl, lastPlayerName, onLoad }: {
                         className="w-full h-full relative"
                     >
                         <img
-                            src={`${imageUrl}${imageUrl.includes('?') ? '&' : '?'}v=${Date.now()}`}
+                            src={imageUrl}
                             className="w-full h-full object-cover"
                             alt="Player Generation"
                             onLoad={onLoad}
