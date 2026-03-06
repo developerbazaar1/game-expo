@@ -29,7 +29,13 @@ export default function ScreenPage() {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const playUrl = typeof window !== 'undefined' ? `${window.location.origin}/play/${eventId}` : '';
+    const [playUrl, setPlayUrl] = useState('');
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setPlayUrl(`${window.location.origin}/play/${eventId}`);
+        }
+    }, [eventId]);
     const activePlayer = players.find(p => p.score === null);
 
     const quotes = [
@@ -147,7 +153,7 @@ export default function ScreenPage() {
                 <div className="flex-1 flex flex-col gap-4 overflow-hidden">
                     {event.status === 'waiting' ? (
                         <div className="flex-1 flex flex-col items-center justify-center bg-glass rounded-[40px] border border-white/10 relative">
-                            <QRDisplay url={playUrl} />
+                            {playUrl && <QRDisplay url={playUrl} />}
                         </div>
                     ) : (
                         <div className="flex-1 flex flex-col gap-4 overflow-hidden">
@@ -168,7 +174,7 @@ export default function ScreenPage() {
                                     <div className="flex-1 relative mt-10">
                                         {showQR ? (
                                             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 z-30">
-                                                <div className="scale-75"><QRDisplay url={playUrl} /></div>
+                                                <div className="scale-75">{playUrl && <QRDisplay url={playUrl} />}</div>
                                             </div>
                                         ) : (
                                             <AIImagePanel imageUrl={event.referenceImageUrl} status={event.status} description={event.referencePrompt} />
