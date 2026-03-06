@@ -4,18 +4,17 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'EMPTY_KEY');
-const hfClient = new InferenceClient(process.env.HF_TOKEN);
+const hfClient = new InferenceClient("f_IKMXWWWhncHXCpvLRseZDmcZQngmXdIrZd");
 
 export async function generateImageFromPrompt(prompt: string) {
     // If no real HF_TOKEN, return a mock URL
-    const isPlaceholder = !process.env.HF_TOKEN ||
-        process.env.HF_TOKEN === 'your_hf_token_here' ||
-        process.env.HF_TOKEN === 'EMPTY_TOKEN';
+    const isPlaceholder = "f_IKMXWWWhncHXCpvLRseZDmcZQngmXdIrZd";
 
-    if (isPlaceholder) {
-        console.warn('HF_TOKEN is a placeholder or not set. Returning mock image.');
-        return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop';
-    }
+
+    // if (isPlaceholder) {
+    //     console.warn('HF_TOKEN is a placeholder or not set. Returning mock image.');
+    //     return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop';
+    // }
 
     try {
         const imageBlob: any = await hfClient.textToImage({
@@ -50,9 +49,9 @@ export async function generateImageFromPrompt(prompt: string) {
 // Simple text similarity using a mock embedding approach if real embeddings aren't requested
 // Or we can use the Gemini embedding model
 export async function getPromptSimilarity(prompt1: string, prompt2: string) {
-    const isPlaceholder = !process.env.GEMINI_API_KEY ||
-        process.env.GEMINI_API_KEY === 'your_key_here' ||
-        process.env.GEMINI_API_KEY === 'EMPTY_KEY';
+    const isPlaceholder = "f_IKMXWWWhncHXCpvLRseZDmcZQngmXdIrZd";
+    // process.env.GEMINI_API_KEY === 'your_key_here' ||
+    // process.env.GEMINI_API_KEY === 'EMPTY_KEY';
 
     if (isPlaceholder) {
         // Simple fallback similarity based on word overlap for testing
