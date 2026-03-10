@@ -51,9 +51,9 @@ export default function Leaderboard({ players }: { players: Player[] }) {
                             layout
                             className={`flex items-center justify-between p-4 rounded-xl relative overflow-hidden group ${idx === 0 ? 'bg-gradient-to-r from-gold/20 to-transparent border border-gold/30' : idx === 1 ? 'bg-gradient-to-r from-blue-500/10 to-transparent border border-blue-500/20' : 'bg-gradient-to-r from-orange-500/10 to-transparent border border-orange-500/20'}`}
                         >
-                            <div className="flex items-center gap-4">
-                                <span className="text-2xl">{getMedalIcon(idx)}</span>
-                                <span className={`text-2xl font-black font-orbitron ${getMedalColor(idx)}`}>{idx + 1}</span>
+                            <div className="flex items-center gap-2">
+                                <span className="">{getMedalIcon(idx)}</span>
+                                <span className={` font-black font-orbitron ${getMedalColor(idx)}`}>{idx + 1}</span>
                                 <span className="font-bold uppercase tracking-tight truncate max-w-[120px] text-white/90">{player.name}</span>
                             </div>
                             <span className={`text-2xl font-black font-orbitron ${getMedalColor(idx)}`}>

@@ -9,6 +9,7 @@ import Leaderboard from '@/components/Leaderboard';
 import AIImagePanel from '@/components/AIImagePanel';
 import PlayerImagePanel from '@/components/PlayerImagePanel';
 import QRDisplay from '@/components/QRDisplay';
+import PromptArenaLoader from '@/components/loaders/PromptArenaLoader';
 
 export default function ScreenPage() {
     const { eventId } = useParams() as { eventId: string };
@@ -40,6 +41,7 @@ export default function ScreenPage() {
         }
     }, [eventId]);
     const activePlayer = players.find(p => p.score === null);
+    const rightPanelPlayer = activePlayer ?? lastSubmission;
 
     const quotes = [
         "Analyzing prompt patterns...",
@@ -73,6 +75,7 @@ export default function ScreenPage() {
             const eventData: any = await getEvent(eventId, abortControllerRef.current.signal);
             setError('');
             setEvent(eventData);
+            
             setPlayers(eventData.players || []);
 
             // Find most recent submission to show on Right Panel
@@ -82,6 +85,9 @@ export default function ScreenPage() {
 
             if (submissions.length > 0) {
                 setLastSubmission(submissions[0]);
+            } else {
+                // Avoid showing a stale "last generated" image when this event has no submissions yet.
+                setLastSubmission(null);
             }
         } catch (err: any) {
             if (err?.name === 'AbortError') return;
@@ -142,7 +148,8 @@ export default function ScreenPage() {
         </div>
     );
 
-    if (!event) return null;
+    if (!event) return <PromptArenaLoader />;
+
 
     return (
         <div className="flex flex-col h-screen max-h-screen bg-[#050508] text-foreground p-6 font-inter relative overflow-hidden">
@@ -196,7 +203,7 @@ export default function ScreenPage() {
                                             {copied ? 'Copied' : 'Invite'}
                                         </button>
                                     </div>
-                                    <div className="flex-1 relative mt-10">
+                                    <div className="flex-1 relative">
                                         {showQR ? (
                                             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 z-30">
                                                 <div className="scale-75">{playUrl && <QRDisplay url={playUrl} />}</div>
@@ -221,10 +228,10 @@ export default function ScreenPage() {
                                     <div className="absolute top-0 inset-x-0 h-10 bg-black/60 backdrop-blur-md flex items-center justify-center border-b border-accent/20 z-20">
                                         <span className="text-[9px] font-orbitron font-black text-accent uppercase tracking-[0.3em]">YOUR GENERATED IMAGE</span>
                                     </div>
-                                    <div className="flex-1 relative mt-10">
+                                    <div className="flex-1 relative">
                                         <PlayerImagePanel
-                                            imageUrl={lastSubmission?.generatedImageUrl}
-                                            lastPlayerName={lastSubmission?.name}
+                                            imageUrl={rightPanelPlayer?.generatedImageUrl ?? null}
+                                            lastPlayerName={rightPanelPlayer?.name ?? null}
                                             onLoad={() => setIsImageReady(true)}
                                         />
                                         {(loading || !isImageReady) && (
@@ -328,7 +335,7 @@ export default function ScreenPage() {
                         <button
                             type="button"
                             onClick={() => setShowQR(!showQR)}
-                            className="px-6 py-4 bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded-xl font-orbitron font-black text-[10px] uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all flex items-center gap-2 group"
+                            className="cursor-pointer px-6 py-4 bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded-xl font-orbitron font-black text-[10px] uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all flex items-center gap-2 group"
                         >
                             <RotateCcw size={14} className="group-hover:rotate-180 transition-transform duration-500" /> {showQR ? 'BACK' : 'REJOIN'}
                         </button>
@@ -344,7 +351,7 @@ export default function ScreenPage() {
                             <button
                                 type="submit"
                                 disabled={!activePlayer || loading || !prompt.trim()}
-                                className={`px-10 py-4 bg-primary text-black rounded-xl font-black font-orbitron text-xs uppercase tracking-widest transition-all relative group overflow-hidden ${(!activePlayer || loading || !prompt.trim()) ? 'opacity-30' : 'hover:scale-105 shadow-glow shadow-primary/30'}`}
+                                className={`cursor-pointer px-10 py-4 bg-primary text-black rounded-xl font-black font-orbitron text-xs uppercase tracking-widest transition-all relative group overflow-hidden ${(!activePlayer || loading || !prompt.trim()) ? 'opacity-30' : 'hover:scale-105 shadow-glow shadow-primary/30'}`}
                             >
                                 {loading && (
                                     <motion.div

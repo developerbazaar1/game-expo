@@ -122,7 +122,7 @@ export default function Home() {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="w-full relative group transform active:scale-[0.98] transition-all"
+                                    className="cursor-pointer w-full relative group transform active:scale-[0.98] transition-all"
                                 >
                                     <div className="absolute inset-0 bg-primary blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
                                     <div className="relative bg-primary hover:bg-white text-black px-8 py-5 rounded-[24px] font-black font-orbitron text-lg uppercase tracking-widest flex items-center justify-center gap-3 transition-all">
@@ -181,7 +181,7 @@ export default function Home() {
 
                                 <button
                                     onClick={() => setEvent(null)}
-                                    className="text-white/30 text-[9px] font-orbitron font-black uppercase tracking-[0.5em] hover:text-accent transition-colors pt-4 flex items-center justify-center gap-2"
+                                    className="cursor-pointer text-white/30 text-[9px] font-orbitron font-black uppercase tracking-[0.5em] hover:text-accent transition-colors pt-4 flex items-center justify-center gap-2"
                                 >
                                     Terminating Current Session <ArrowRight size={10} />
                                 </button>

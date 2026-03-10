@@ -5,15 +5,18 @@ import { Sparkles } from 'lucide-react';
 
 export default function AIImagePanel({ imageUrl, description }: { imageUrl: string, status?: string, description?: string }) {
     return (
-        <div className="w-full h-full relative group">
+        <div className="relative group bg-black/40 overflow-hidden">
             {imageUrl ? (
                 <motion.img
                     key={imageUrl}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     src={imageUrl}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain object-center"
                     alt="AI Reference"
+                   style={{
+                    height: "600px"
+                   }}
                 />
             ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center gap-4 opacity-10 bg-black/40">

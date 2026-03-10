@@ -16,8 +16,11 @@ export default function PlayerImagePanel({ imageUrl, lastPlayerName, onLoad }: {
                     >
                         <img
                             src={imageUrl}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain object-center"
                             alt="Player Generation"
+                             style={{
+                    height: "600px"
+                   }}
                             onLoad={onLoad}
                             onError={(e) => {
                                 // If the image fails to load, hide it and show placeholder

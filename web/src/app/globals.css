@@ -108,3 +108,27 @@ body {
     bottom: -100px;
   }
 }
+
+
+/* Shimmer css start */
+@keyframes shimmer {
+  0% {
+    background-position: -1200px 0;
+  }
+  100% {
+    background-position: 1200px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(40,40,40,0.4) 25%,
+    rgba(80,80,80,0.6) 50%,
+    rgba(40,40,40,0.4) 75%
+  );
+  background-size: 1200px 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+/* Shimmer css end */
