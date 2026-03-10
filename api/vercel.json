@@ -1,0 +1,11 @@
+{
+  "functions": {
+    "src/**/*.ts": {
+      "includeFiles": "src/test1.png"
+    },
+    "dist/**/*.js": {
+      "includeFiles": "dist/test1.png"
+    }
+  }
+}
+

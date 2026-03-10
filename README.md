@@ -14,6 +14,9 @@ This is a full-stack corporate activation project.
 3. Run migrations: `npx prisma migrate dev --name init`
 4. Start dev server: `npm run dev` (runs on port 4000)
 
+#### Reference image (prod/Vercel)
+The API reads a local reference image (`api/src/test1.png`) to generate the initial AI prompt. On Vercel/serverless, make sure the file is included in the function bundle (this repo copies it to `api/dist/test1.png` on build and also includes it via `api/vercel.json`). You can override the location with `REFERENCE_IMAGE_PATH` or change the filename with `REFERENCE_IMAGE_FILE`.
+
 ### Frontend (Web)
 1. Go to `web/`
 2. Install dependencies: `npm install`
