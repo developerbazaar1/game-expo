@@ -229,7 +229,7 @@ export default async function eventRoutes(fastify: FastifyInstance, options: Fas
 
             // Update event wins
             const updateData: any = {};
-            if (score >= 80) {
+            if (score >= 90) {
                 updateData.humanWins = { increment: 1 };
             } else {
                 updateData.aiWins = { increment: 1 };
