@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { joinEvent } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { User, Mail, Loader2, Phone, CheckCircle2 } from "lucide-react";
-import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import PhoneInput from "react-phone-number-input";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import "react-phone-number-input/style.css";
 
@@ -18,10 +18,42 @@ export default function PlayPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const normalizeName = (value: string) => value.trim().replace(/\s+/g, " ");
+  const isValidName = (value: string) => /^[\p{L} ]+$/u.test(value);
+  const isValidEmail = (value: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    const trimmedName = normalizeName(name);
+    const trimmedEmail = email.trim();
+
+    if (!trimmedName) {
+      setError("Name is required.");
+      setLoading(false);
+      return;
+    }
+
+    if (!isValidName(trimmedName)) {
+      setError("Name can only contain letters and spaces.");
+      setLoading(false);
+      return;
+    }
+
+    if (!trimmedEmail) {
+      setError("Email is required.");
+      setLoading(false);
+      return;
+    }
+
+    if (!isValidEmail(trimmedEmail)) {
+      setError("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
 
     if (!phone) {
       setError("Phone number is required.");
@@ -30,7 +62,7 @@ export default function PlayPage() {
     }
 
     const phoneNumberObj = parsePhoneNumberFromString(phone);
-    if (!phoneNumberObj || !phoneNumberObj.isValid()) {
+    if (!phoneNumberObj || !phoneNumberObj.isPossible()) {
       setError(
         "Please enter a valid phone number with the correct number of digits for your country.",
       );
@@ -38,7 +70,9 @@ export default function PlayPage() {
       return;
     }
     try {
-      await joinEvent(eventId, name, email, phone);
+      setName(trimmedName);
+      setEmail(trimmedEmail);
+      await joinEvent(eventId, trimmedName, trimmedEmail, phone);
       setStatus("registered");
     } catch (err: any) {
       setError(err.message);
@@ -131,7 +165,7 @@ export default function PlayPage() {
             </label>
             <PhoneInput
               international
-              defaultCountry="IN"
+              defaultCountry="BE"
               value={phone}
               onChange={(val) => setPhone(val || "")}
               limitMaxLength={true}
