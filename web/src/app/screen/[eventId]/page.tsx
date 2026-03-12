@@ -55,6 +55,11 @@ export default function ScreenPage() {
   const activePlayer = players.find((p) => p.score === null);
   const rightPanelPlayer = activePlayer ?? lastSubmission;
 
+  const handleRejoinClick = () => {
+    setShowQR(true);
+    setIsImageReady(true);
+  };
+
   const quotes = [
     "Analyzing prompt patterns...",
     "Synthesizing visual matrix...",
@@ -266,62 +271,85 @@ export default function ScreenPage() {
                     </span>
                   </div>
                   <div className="flex-1 relative">
-                    <PlayerImagePanel
-                      imageUrl={rightPanelPlayer?.generatedImageUrl ?? null}
-                      lastPlayerName={rightPanelPlayer?.name ?? null}
-                      onLoad={() => setIsImageReady(true)}
-                    />
-                    {(loading || !isImageReady) && (
+                    {showQR ? (
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         className="absolute inset-0 bg-black/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center p-8 text-center"
                       >
-                        {/* Scanning Bar */}
-                        <motion.div
-                          animate={{ top: ["0%", "100%", "0%"] }}
-                          transition={{
-                            duration: 2,
-                            repeat: Infinity,
-                            ease: "linear",
-                          }}
-                          className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_15px_rgba(0,210,255,0.8)] z-40"
-                        />
-
                         <Loader2
                           size={48}
                           className="text-primary animate-spin mb-6"
                         />
-                        <div className="space-y-4">
-                          <p className="text-xs font-orbitron font-black text-primary uppercase tracking-[0.4em] animate-pulse">
-                            Neural Synthesizing
+                        <div className="space-y-3">
+                          <p className="text-xs font-orbitron font-black text-primary uppercase tracking-[0.4em]">
+                            Waiting for response
                           </p>
-                          <AnimatePresence mode="wait">
-                            <motion.div
-                              key={statusMessage}
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -10 }}
-                              className="flex flex-col items-center gap-2"
-                            >
-                              <p className="text-[10px] font-mono text-white/40 uppercase tracking-[0.2em]">
-                                {statusMessage}
-                              </p>
-                              <div className="w-32 h-1 bg-white/5 rounded-full overflow-hidden">
-                                <motion.div
-                                  initial={{ x: "-100%" }}
-                                  animate={{ x: "100%" }}
-                                  transition={{
-                                    duration: 1.2,
-                                    repeat: Infinity,
-                                  }}
-                                  className="w-full h-full bg-primary/40"
-                                />
-                              </div>
-                            </motion.div>
-                          </AnimatePresence>
+                          <p className="text-[10px] font-mono text-white/40 uppercase tracking-[0.2em]">
+                            Scan the QR code to rejoin
+                          </p>
                         </div>
                       </motion.div>
+                    ) : (
+                      <>
+                        <PlayerImagePanel
+                          imageUrl={rightPanelPlayer?.generatedImageUrl ?? null}
+                          lastPlayerName={rightPanelPlayer?.name ?? null}
+                          onLoad={() => setIsImageReady(true)}
+                        />
+                        {(loading || !isImageReady) && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="absolute inset-0 bg-black/60 backdrop-blur-sm z-30 flex flex-col items-center justify-center p-8 text-center"
+                          >
+                            {/* Scanning Bar */}
+                            <motion.div
+                              animate={{ top: ["0%", "100%", "0%"] }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "linear",
+                              }}
+                              className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_15px_rgba(0,210,255,0.8)] z-40"
+                            />
+
+                            <Loader2
+                              size={48}
+                              className="text-primary animate-spin mb-6"
+                            />
+                            <div className="space-y-4">
+                              <p className="text-xs font-orbitron font-black text-primary uppercase tracking-[0.4em] animate-pulse">
+                                Neural Synthesizing
+                              </p>
+                              <AnimatePresence mode="wait">
+                                <motion.div
+                                  key={statusMessage}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -10 }}
+                                  className="flex flex-col items-center gap-2"
+                                >
+                                  <p className="text-[10px] font-mono text-white/40 uppercase tracking-[0.2em]">
+                                    {statusMessage}
+                                  </p>
+                                  <div className="w-32 h-1 bg-white/5 rounded-full overflow-hidden">
+                                    <motion.div
+                                      initial={{ x: "-100%" }}
+                                      animate={{ x: "100%" }}
+                                      transition={{
+                                        duration: 1.2,
+                                        repeat: Infinity,
+                                      }}
+                                      className="w-full h-full bg-primary/40"
+                                    />
+                                  </div>
+                                </motion.div>
+                              </AnimatePresence>
+                            </div>
+                          </motion.div>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -410,14 +438,15 @@ export default function ScreenPage() {
           >
             <button
               type="button"
-              onClick={() => setShowQR(!showQR)}
-              className="cursor-pointer px-6 py-4 bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded-xl font-orbitron font-black text-[10px] uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all flex items-center gap-2 group"
+              disabled={!!activePlayer}
+              onClick={handleRejoinClick}
+              className={`cursor-pointer px-6 py-4 bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded-xl font-orbitron font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 group ${activePlayer ? "opacity-40 cursor-not-allowed" : "hover:bg-rose-500 hover:text-white"}`}
             >
               <RotateCcw
                 size={14}
                 className="group-hover:rotate-180 transition-transform duration-500"
               />{" "}
-              {showQR ? "BACK" : "REJOIN"}
+              REJOIN
             </button>
             <form onSubmit={handleSendPrompt} className="flex-1 flex gap-3">
               <input
